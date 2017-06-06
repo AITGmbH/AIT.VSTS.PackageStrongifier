@@ -1,0 +1,36 @@
+{
+    "manifestVersion": 1,
+    "id": "ait-packaging-task",
+    "name": "AIT Package Signing",
+    "version": "0.1.0",
+    "publisher": "matthid",
+    "targets": [
+        {
+            "id": "Microsoft.VisualStudio.Services"
+        }
+    ],    
+    "description": "Tools for signing packages from a NuGet feed and uploading the signed version to another NuGet feed.",
+    "categories": [
+        "Build and release"
+    ],
+    "icons": {   
+      "default": "extension-icon.png" 
+    },
+    "files": [
+        {
+            "path": "createsignedpackages"
+        }
+    ],
+    "contributions": [
+        {
+            "id": "set-build-version-from-artifact-build-task",
+            "type": "ms.vss-distributed-task.task",
+            "targets": [
+                "ms.vss-distributed-task.tasks"
+            ],
+            "properties": {
+                "name": "createsignedpackages"
+            }
+        }
+    ]
+}

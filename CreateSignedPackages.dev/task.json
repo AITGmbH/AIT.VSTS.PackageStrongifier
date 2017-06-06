@@ -1,0 +1,84 @@
+{
+    "id": "cd8f2d73-d3a5-4271-843c-c798ffb88b91",
+    "name": "createsignedpackages",
+    "friendlyName": "Sign NuGet packages",
+    "description": "Resolves the given list of packages and their dependencies, signs unsigned assemblies, replaces assembly references with the strong name, packages the result in a new NuGet package.",
+    "helpMarkDown": "This task helps you with consuming unsigned NuGet packages by signing them and uploading them to your own feed. To upload use the regular publish task.",
+    "category": "Utility",
+    "author": "Matthias Dittrich",
+    "version": {
+        "Major": 0,
+        "Minor": 1,
+        "Patch": 0
+    },
+    "instanceNameFormat": "Sign NuGet packages",
+    "groups": [
+        {
+            "name": "variables",
+            "displayName": "Variables",
+            "isExpanded": false
+        },
+        {
+            "name": "advanced",
+            "displayName": "Advanced",
+            "isExpanded": false
+        }
+    ],
+    "inputs": [
+        {
+            "name": "packageList",
+            "type": "multiLine",
+            "label": "The packages to sign",
+            "defaultValue": "source https://nuget.org/api/v2\n\nnuget gong-wpf-dragdrop",
+            "required": true,
+            "helpMarkDown": "This file uses the paket.dependencies format as specified in https://fsprojects.github.io/Paket/dependencies-file.html."
+        },
+        {
+            "name": "snkFile",
+            "type": "filePath",
+            "label": "The strong name key to sign the asssemblies with",
+            "defaultValue": "",
+            "required": true,
+            "helpMarkDown": "The task will use this snk file to sign the assemblies."
+        },
+        {
+            "name": "outputDirectory",
+            "type": "filePath",
+            "label": "Location to copy the new packages into.",
+            "defaultValue": "$(System.DefaultWorkingDirectory)/SignedPackages",
+            "required": true,
+            "helpMarkDown": "This directory will contain all the signed packages after processing."
+        },
+        {
+            "name": "targetFeed",
+            "type": "string",
+            "label": "The feed to search for existing signed packages.",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "This ensures that only new packages are writen into the output directory (therefore the following tasks will not fail). The format is given by a single source line as in https://fsprojects.github.io/Paket/nuget-dependencies.html. An empty line removes this check.\n\n For example use a line similar to \n'source http://tfs.domain.tld:8080/tfs/Collection/_packaging/FEED/nuget/v3/index.json username: \"username\" password: \"PAT\"'.\n\n Note that the PAT only needs access to list existing package versions."
+        },
+        {
+            "name": "snkPassword",
+            "type": "string",
+            "label": "The password for the snk file",
+            "defaultValue": "",
+            "required": false,
+            "helpMarkDown": "leave empty if the snk file is not protected with a password.",
+            "groupName": "advanced"
+        },
+        {
+            "name": "signedPackagePostfix",
+            "type": "string",
+            "label": "Postfix to add to the new package-id.",
+            "defaultValue": ".Signed",
+            "required": false,
+            "helpMarkDown": "As it is bad practice to re-use the same package-ids for different packages we highly recommend to set this to an non-empty string.",
+            "groupName": "advanced"
+        }
+    ],
+    "execution": {
+        "Node": {
+            "target": "startProcess.js"
+        }
+    }
+}
