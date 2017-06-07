@@ -55,3 +55,6 @@ This has the following disadvantages:
 
 But all in all it's a more robust way of doing things. 
 
+## Upgrade generator "Signed-v1" -> "Signed-v2"
+
+- Search and replace the ".Signed-v1" postfix with ".Signed-v2" in all the package.config files.

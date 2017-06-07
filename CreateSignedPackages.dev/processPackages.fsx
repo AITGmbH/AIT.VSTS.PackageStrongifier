@@ -427,8 +427,9 @@ module ProcessPackages =
         | AlreadySignedPackage -> ()
         | SignedPackage ->
             let dir = proc.FinalDirectory
+            // maybe have white instead of blacklist?
             let toRemove =
-                [ "_rels"; "[Content_Types].xml";
+                [ "_rels"; "[Content_Types].xml"; "package"
                   sprintf "%s.%s.nupkg" proc.Package.Name.Name proc.Package.Version.AsString
                   sprintf "%s.%s.nupkg.sha512" proc.Package.Name.Name proc.Package.Version.AsString ]
             for r in toRemove do
