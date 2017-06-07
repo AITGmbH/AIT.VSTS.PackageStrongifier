@@ -1,5 +1,6 @@
 version 5.0.0-rc001
 source https://nuget.org/api/v2
+framework: net45
 
 nuget FAKE prerelease
 nuget Microsoft.Build.Utilities.Core
