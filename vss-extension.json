@@ -2,7 +2,7 @@
     "manifestVersion": 1,
     "id": "ait-packaging-task",
     "name": "AIT Package Signing",
-    "version": "0.1.0",
+    "version": "0.1.2",
     "publisher": "matthid",
     "targets": [
         {

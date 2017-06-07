@@ -9,6 +9,7 @@ node_modules
 /.fake/build.fsx/*
 !/.fake/build.fsx/paket.lock
 
+*.pdb
 .taskkey
 
 CreateSignedPackages.dev/bin

@@ -37,7 +37,7 @@ export TargetFeed=""
 export SignedPackagePostfix=".Signed"
 
 # Test the fake script
-./bin/Fake/FAKE.exe processPackages.fsx
+./packages/FAKE/tools/FAKE.exe processPackages.fsx
 
 # Test the nodejs integration
 npm run tsc
@@ -47,6 +47,11 @@ node startProcess.js
 
 And test the logic.
 
-# 20MB Limitation
+# Debugging the F# script
 
-Extract the vsix (is a regular zip file) and compress it again with 
+1. Clone FAKE (https://github.com/fsharp/FAKE)
+2. Setup Environment variables (as above) and start Visual Studio with those 
+   easiest is to setup environment variables in git bash (as above) and run
+   `"/c/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/Common7/IDE/devenv.exe"`
+3. Setup arguments and working dir in the FAKE project
+4. Start Debugging (make sure the solution is in DEBUG configuration).

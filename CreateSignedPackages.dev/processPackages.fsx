@@ -78,10 +78,16 @@ module SigningHelper =
             | Some f -> f
             | None ->
                 failwithf "Could not resolve '%s'" name
+        let known = System.Collections.Concurrent.ConcurrentDictionary<string, Mono.Cecil.AssemblyDefinition>()
         let readAssemblyE (name:string) (parms: Mono.Cecil.ReaderParameters) =
-            Mono.Cecil.AssemblyDefinition.ReadAssembly(
-                resolve name,
-                parms)
+            known.GetOrAdd(
+                name, 
+                (fun _ ->
+                    Mono.Cecil.AssemblyDefinition.ReadAssembly(
+                        resolve name,
+                        parms)))
+            
+            
         let readAssembly (name:string) (x:Mono.Cecil.IAssemblyResolver) =
             readAssemblyE name (Mono.Cecil.ReaderParameters(AssemblyResolver = x))
         { new Mono.Cecil.IAssemblyResolver with
@@ -273,12 +279,15 @@ module ProcessPackages =
                 | Some prof -> Runtime.Versioning.FrameworkName(fwm, v, prof)
             ToolLocationHelper.GetPathToReferenceAssemblies(name)
             |> Seq.toList
+            |> Some
         let references =
             match PlatformMatching.extractPlatforms folderName |> Option.bind (fun t -> t.ToTargetProfile) with
             | None when folderName = "lib" ->
                 getRefs ".NETFramework" (Version(3,5)) (Some "Client")
             | Some (SinglePlatform (FrameworkIdentifier.DotNetStandard _))
-            | Some (SinglePlatform (FrameworkIdentifier.DotNetCore _)) -> []
+            | Some (SinglePlatform (FrameworkIdentifier.DotNetCore _)) -> 
+                //printfn "Not signing netstandard stuff."
+                Some []
             | Some (SinglePlatform (FrameworkIdentifier.DotNetFramework FrameworkVersion.V3))
             | Some (SinglePlatform(FrameworkIdentifier.DotNetFramework FrameworkVersion.V3_5)) ->
                 getRefs ".NETFramework" (Version(3,5)) (Some "Client")
@@ -305,11 +314,11 @@ module ProcessPackages =
             | Some (PortableProfile(PortableProfileType.UnsupportedProfile fws)) ->
                 match findVersionForProfile fws with
                 | Some v -> getRefs ".NETPortable" v None
-                | None -> []
+                | None -> Some []
             | Some (PortableProfile(profile) as p) ->
                 match findVersionForProfile p.Frameworks with
                 | Some v -> getRefs ".NETPortable" v (Some profile.ProfileName)
-                | None -> []
+                | None -> Some []
             | Some (SinglePlatform(FrameworkIdentifier.WindowsPhone WindowsPhoneVersion.V8)) ->
                 getRefs "WindowsPhone" (Version(8,0)) None
             | Some (SinglePlatform(FrameworkIdentifier.WindowsPhone WindowsPhoneVersion.V8_1)) ->
@@ -318,16 +327,16 @@ module ProcessPackages =
                 getRefs "WindowsPhoneApp" (Version(8,1)) None
             | Some fw ->
                 eprintfn "Unsuported framework %A" fw
-                []
+                Some []
             | None ->
                 eprintfn "Could not detect framework from %s" folderName
-                []
-        let result =
+                Some []
+        references 
+        |> Option.map (fun references ->
             references
             |> Seq.map (Path.GetDirectoryName)
             |> Seq.distinct
-            |> Seq.toList
-        result
+            |> Seq.toList)
 
     let signPackageIfNeeded (sn:StrongNameKeyPair) (handled:Map<_,ProcessingInfo>) (cache:DependencyCache) signedPackageDir groupName package =
         let dir = DirectoryInfo (extractPackageUserFolder groupName package)
@@ -335,7 +344,6 @@ module ProcessPackages =
         // System.ArgumentException: The directory specified, 'lib', is not a subdirectory of 'mypackages\WPFToolkit-3.5.50211.1'.
         let target = DirectoryInfo (Path.GetFullPath signedPackageDir)
         CleanDir signedPackageDir
-        printfn "Copying '%s' -> '%s'" dir.FullName target.FullName
         copyDirectory dir target
         
         let probingPaths =
@@ -358,7 +366,13 @@ module ProcessPackages =
             |> List.map (fun assembly ->
                 try
                     let frameworkRef = getFrameworkReferences (Path.GetFileName (Path.GetDirectoryName assembly.FullName))
-                    SigningHelper.signAssemblyInPlace assembly.FullName sn (probingPaths @ frameworkRef)
+                    match frameworkRef with
+                    | Some fw ->
+                        // Note: We prefer the framework path here, because otherwise we run into problems with netstandard packages
+                        // We probably want a more fine grained solution eventually.
+                        // But maybe it's not as bad as we only really need the "API" and don't care about the implementation of references.
+                        SigningHelper.signAssemblyInPlace assembly.FullName sn (fw @ probingPaths)
+                    | None -> false
                 with e ->
                     eprintfn "Error while signing assembly %s: \n%O" assembly.FullName e
                     false)
@@ -375,12 +389,14 @@ module ProcessPackages =
             newDirs @ probingPaths
             |> List.distinct
         if wasSigned then
+            printfn "  was already signed"
             { ConvertResult = SignedPackage
               FinalDirectory = target.FullName
               ProbingPaths = findDirs target
               Cache = cache
               Package = package }
         else
+            printfn "  successfully signed"
             { ConvertResult = AlreadySignedPackage
               FinalDirectory = dir.FullName
               ProbingPaths = findDirs dir
