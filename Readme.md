@@ -58,3 +58,6 @@ But all in all it's a more robust way of doing things.
 ## Upgrade generator "Signed-v1" -> "Signed-v2"
 
 - Search and replace the ".Signed-v1" postfix with ".Signed-v2" in all the package.config files.
+- If you run into problems, try:
+   - Delete all nuget references from the project file
+   - Update-Package -reinstall -Project YourProjectName
