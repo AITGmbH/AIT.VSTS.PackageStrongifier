@@ -16,7 +16,11 @@ See Contribution.md
 1. Build (see Contribution.md)
 2. Install extension (upload on http://tfs.myserver:8080/tfs/_gallery/manage)
    See https://stackoverflow.com/questions/40810914/how-do-you-install-extension-vsix-files-to-tfs-2015-update-3
-3. TODO
+3. Setup build with the new Build task.
+   
+   > Note: The build must run on an agent with full Visual Studio (ideally 2017) installed, the important part is
+   > that the `C:\Program Files (x86)\Reference Assemblies\Microsoft` is properly 
+   > filled with all portables and framework versions.
 
 
 ## Technical details
