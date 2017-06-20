@@ -1,11 +1,17 @@
-# AIT.VSTS.PackageSigning
+# AIT.VSTS.PackageStrongifier
 
-The Package Signing build task allows you to download NuGet packages, sign them and create signed packages in your own NuGet feed.
+The Package Strongifier build task allows you to download NuGet packages, sign them and create signed packages in your own NuGet feed.
 This simplifies the usage of unsigned NuGet packages as you just use the signed version of your own feed just like any other package.
 
 Other solutions like https://github.com/brutaldev/StrongNameSigner, https://www.nuget.org/packages/Nivot.StrongNaming/ or similar approaches change your build pipeline
 and hook into msbuild and sign references before doing the actual compilation.
 This complicates the build process and makes failures a lot more difficult to analyse and debug. 
+
+Be sure to check out if you actually need strong named packages:
+
+ - [What? and Why?](https://docs.microsoft.com/en-us/dotnet/framework/app-domains/strong-named-assemblies)
+ - [It is not code signing](https://stackoverflow.com/questions/4469646/net-strong-naming-vs-authenticode)
+ - [And there are pitfalls](https://www.pedrolamas.com/2016/03/01/still-strong-naming-your-assemblies-you-do-know-its-2016-right/)
 
 ## Build
 

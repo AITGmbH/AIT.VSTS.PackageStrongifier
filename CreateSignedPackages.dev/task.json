@@ -1,17 +1,17 @@
 {
     "id": "cd8f2d73-d3a5-4271-843c-c798ffb88b91",
     "name": "createsignedpackages",
-    "friendlyName": "Sign NuGet packages",
-    "description": "Resolves the given list of packages and their dependencies, signs unsigned assemblies, replaces assembly references with the strong name, packages the result in a new NuGet package.",
-    "helpMarkDown": "This task helps you with consuming unsigned NuGet packages by signing them and uploading them to your own feed. To upload use the regular publish task.",
+    "friendlyName": "Strong name NuGet packages",
+    "description": "Resolves the given list of packages and their dependencies, signs unsigned assemblies, replaces assembly references with the strong named version, packages the result in a new NuGet package.",
+    "helpMarkDown": "This task helps you with consuming unsigned NuGet packages by strong naming them and uploading them to your own feed. To upload use the regular publish task.",
     "category": "Utility",
     "author": "Matthias Dittrich",
     "version": {
         "Major": 0,
         "Minor": 1,
-        "Patch": 4
+        "Patch": 5
     },
-    "instanceNameFormat": "Sign NuGet packages",
+    "instanceNameFormat": "Strong Name NuGet packages",
     "groups": [
         {
             "name": "advanced",
@@ -23,7 +23,7 @@
         {
             "name": "packageList",
             "type": "multiLine",
-            "label": "The packages to sign",
+            "label": "The packages to give a strong name",
             "defaultValue": "source https://nuget.org/api/v2\n\nnuget gong-wpf-dragdrop",
             "required": true,
             "helpMarkDown": "This file uses the paket.dependencies format as specified in https://fsprojects.github.io/Paket/dependencies-file.html."
@@ -47,7 +47,7 @@
         {
             "name": "targetFeed",
             "type": "string",
-            "label": "The feed to search for existing signed packages.",
+            "label": "The feed to search for existing strong named packages.",
             "defaultValue": "",
             "required": false,
             "helpMarkDown": "This ensures that only new packages are writen into the output directory (therefore the following tasks will not fail). The format is given by a single source line as in https://fsprojects.github.io/Paket/nuget-dependencies.html. An empty line removes this check.\n\n For example use a line similar to \n'source http://tfs.domain.tld:8080/tfs/Collection/_packaging/FEED/nuget/v3/index.json username: \"username\" password: \"PAT\"'.\n\n Note that the PAT only needs access to list existing package versions."

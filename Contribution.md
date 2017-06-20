@@ -49,7 +49,7 @@ And test the logic.
 
 # Debugging the F# script
 
-1. Clone FAKE (https://github.com/fsharp/FAKE)
+1. Clone FAKE (https://github.com/fsharp/FAKE) (restore packages after clone via `.paket/paket.exe restore`)
 2. Setup Environment variables (as above) and start Visual Studio with those 
    easiest is to setup environment variables in git bash (as above) and run
    `"/c/Program Files (x86)/Microsoft Visual Studio/2017/Enterprise/Common7/IDE/devenv.exe"`

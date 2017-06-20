@@ -1,15 +1,15 @@
 {
     "manifestVersion": 1,
     "id": "ait-packaging-task",
-    "name": "AIT Package Signing",
-    "version": "0.1.4",
+    "name": "AIT Package Strongifier",
+    "version": "0.1.5",
     "publisher": "matthid",
     "targets": [
         {
             "id": "Microsoft.VisualStudio.Services"
         }
     ],    
-    "description": "Tools for signing packages from a NuGet feed and uploading the signed version to another NuGet feed.",
+    "description": "Tools for strong naming packages from a NuGet feed and uploading the strong named version to another NuGet feed.",
     "categories": [
         "Build and release"
     ],
