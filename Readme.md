@@ -31,7 +31,7 @@ See Contribution.md
 
 ## Technical details
 
-# We use the follwoing projects
+# We use the following projects
 
 - Paket - https://github.com/fsprojects/Paket
   - To resolve the dependency tree
