@@ -13,7 +13,7 @@ fake run build.fsx
 
 # How to run standalone (development)
 
-First restore all depencies `fake run build.fsx`
+First restore all dependencies `fake run build.fsx`
 Then enter the task directory `cd CreateSignedPackages.dev`
 
 And restore task dependencies `./bin/paket.exe restore`
