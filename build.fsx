@@ -1,6 +1,4 @@
-(* -- Fake Dependencies paket-inline
-source https://nuget.org/api/v2
-
+#r "paket:
 // Currently we use 'old' FAKE in the task because
 // not all APIs (StrongNameKeyPair) are available in netcore
 // And Mono.Cecil has removed support for Strong naming in netcore version
@@ -15,9 +13,8 @@ nuget Fake.Core.Process prerelease
 nuget Fake.IO.FileSystem prerelease
 nuget Fake.Core.Targets prerelease
 nuget Fake.Core.Environment prerelease
-
--- Fake Dependencies -- *)
-#load ".fake/build.fsx/loadDependencies.fsx"
+//"
+#load ".fake/build.fsx/intellisense.fsx"
 
 open System
 open System.Text
@@ -25,7 +22,7 @@ open System.Text.RegularExpressions
 open System.IO
 open System.Collections.Generic
 open Fake.Core
-open Fake.IO.FileSystem
+open Fake.IO
 
 
 open System.Net.Http
@@ -144,9 +141,10 @@ module Util =
             then fileName, args else "cmd", ("/C " + fileName + " " + args)
         let ok =
             Process.execProcess (fun info ->
-                info.FileName <- fileName
-                info.WorkingDirectory <- workingDir
-                info.Arguments <- args) TimeSpan.MaxValue
+                { info with
+                    FileName = fileName
+                    WorkingDirectory = workingDir
+                    Arguments = args }) TimeSpan.MaxValue
         if not ok then failwith (sprintf "'%s> %s %s' task failed" workingDir fileName args)
 
     let start workingDir fileName args =
@@ -163,9 +161,10 @@ module Util =
             if Environment.isUnix
             then fileName, args else "cmd", ("/C " + args)
         Process.ExecProcessAndReturnMessages (fun info ->
-            info.FileName <- fileName
-            info.WorkingDirectory <- workingDir
-            info.Arguments <- args) TimeSpan.MaxValue
+            { info with
+                FileName = fileName
+                WorkingDirectory = workingDir
+                Arguments = args}) TimeSpan.MaxValue
         |> fun p -> p.Messages |> String.concat "\n"
 
     let downloadArtifact path (url: string) =
@@ -289,13 +288,13 @@ module Node =
         let args = sprintf "%s %s" script (String.concat " " args)
         Util.run workingDir "node" args
 
-open Fake.Core.Targets
+open Fake.Core
 open Fake.Core.TargetOperators
 let dirs = ["CreateSignedPackages.dev"]
 
-Target "Clean" (fun _ -> ())
+Target.Create "Clean" (fun _ -> ())
 
-Target "NpmInstall" (fun _ ->
+Target.Create "NpmInstall" (fun _ ->
     Npm.install "." []
     for dir in dirs do
         Npm.install dir []
@@ -310,12 +309,12 @@ Target "NpmInstall" (fun _ ->
 //    Shell.cp_r ".fake/build.fsx/packages/NuGet.CommandLine/tools" "CreateSignedPackages.dev/bin/NuGet"
 //)
 
-Target "Compile" (fun _ ->
+Target.Create "Compile" (fun _ ->
     for dir in dirs do
         Npm.script dir "tsc" []
 )
 
-Target "Bundle" (fun _ ->
+Target.Create "Bundle" (fun _ ->
     // Workaround for not having an "exclude" feature...
     Shell.CleanDir "CreateSignedPackages"
     Shell.cp_r "CreateSignedPackages.dev" "CreateSignedPackages"
@@ -326,7 +325,7 @@ Target "Bundle" (fun _ ->
     Npm.script "." "tfx" ["extension"; "create"; "--manifest-globs"; "vss-extension.json"]
 )
 
-Target "Default" (fun _ -> ())
+Target.Create "Default" (fun _ -> ())
 
 "Clean"
     ==> "NpmInstall"
@@ -335,4 +334,4 @@ Target "Default" (fun _ -> ())
     ==> "Bundle"
     ==> "Default"
 
-RunTargetOrDefault "Default"
+Target.RunOrDefault "Default"
