@@ -1,5 +1,7 @@
 # AIT.VSTS.PackageStrongifier
 
+__! This project wil go into an archived status and will no longer be maintained !__
+
 The Package Strongifier build task allows you to download NuGet packages, sign them and create signed packages in your own NuGet feed.
 This simplifies the usage of unsigned NuGet packages as you just use the signed version of your own feed just like any other package.
 
